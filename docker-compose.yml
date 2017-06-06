@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+    application:
+        container_name: chat_application
+        image: debian
+        volumes:
+            - ./frontend:/var/www/html
+    server:
+        container_name: chat_server
+        image: debian
+        volumes:
+            - ./server:/root
+    logs:
+        container_name: chat_logs
+        image: debian
+        volumes:
+            - .docker/logs/apache:/var/log/apache2
+    apache:
+        container_name: chat_apache
+        restart: always
+        image: nimmis/apache-php5
+        volumes_from:
+            - logs
+            - application
+        ports:
+            - "8688:80"
+    websocket:
+        container_name: chat_websocket
+        image: tungshooter/nodejs-ws
+        tty: true
+        volumes_from:
+            - server
+        ports:
+            - "8080:8080"
